@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Website Detection System | ML Major Project</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="page-wrapper">
+    <div class="container">
+        <!-- Main Card -->
+        <div class="main-card animate-fade-in">
+            <!-- Header Section -->
+            <header class="card-header">
+                <div class="academic-badge">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>B.Tech Project &bull; Machine Learning & Cyber Security</span>
+                </div>
+                
+                <div class="title-row">
+                    <div class="icon-bubble">
+                        <i class="fa-solid fa-shield-virus"></i>
+                    </div>
+                    <div>
+                        <h1>Phishing Website Detection System</h1>
+                        <p class="subtitle">Real-time URL classification using character n-grams and supervised logistic regression.</p>
+                    </div>
+                </div>
+
+                <!-- Academic Metric Stats -->
+                <div class="stats-pills">
+                    <div class="stat-pill">
+                        <i class="fa-solid fa-database"></i>
+                        <span>500K+ Dataset URLs</span>
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <span>98.0% Accuracy</span>
+                    </div>
+                    <div class="stat-pill">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>Sub-word N-Gram NLP</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- URL Submission Form -->
+            <form action="/predict" method="POST" class="url-form">
+                <div class="form-group">
+                    <label for="url">
+                        <i class="fa-solid fa-link"></i> Website URL to Inspect
+                    </label>
+                    <div class="input-container">
+                        <span class="input-icon"><i class="fa-solid fa-globe"></i></span>
+                        <input
+                            type="text"
+                            id="url"
+                            name="url"
+                            placeholder="https://example.com or suspicious-domain.xyz"
+                            value="{{ entered_url if entered_url else '' }}"
+                            required
+                            autocomplete="off"
+                            spellcheck="false">
+                        {% if entered_url %}
+                        <button type="button" class="input-clear-btn" onclick="clearInput()" title="Clear">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Quick Test Samples -->
+                <div class="quick-samples">
+                    <span class="samples-title"><i class="fa-solid fa-flask"></i> Quick Samples:</span>
+                    <div class="chips-list">
+                        <button type="button" class="chip chip-safe" onclick="fillUrl('https://swayam.gov.in/')">
+                            <i class="fa-solid fa-building-columns"></i> swayam.gov.in
+                        </button>
+                        <button type="button" class="chip chip-safe" onclick="fillUrl('https://www.google.com')">
+                            <i class="fa-brands fa-google"></i> google.com
+                        </button>
+                        <button type="button" class="chip chip-safe" onclick="fillUrl('https://wikipedia.org')">
+                            <i class="fa-brands fa-wikipedia-w"></i> wikipedia.org
+                        </button>
+                        <button type="button" class="chip chip-danger" onclick="fillUrl('amazon.de-register.net/')">
+                            <i class="fa-solid fa-triangle-exclamation"></i> amazon.de-register.net
+                        </button>
+                        <button type="button" class="chip chip-danger" onclick="fillUrl('http://192.168.1.1/paypal/login.html')">
+                            <i class="fa-solid fa-network-wired"></i> IP Login Phish
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa-solid fa-magnifying-glass"></i> Analyze Website
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="window.location='/'">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> Reset
+                    </button>
+                </div>
+            </form>
+
+            <!-- Error Banner -->
+            {% if error %}
+            <div class="alert-box alert-error animate-slide-down">
+                <div class="alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <div class="alert-content">{{ error }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Prediction Result Card -->
+            {% if prediction %}
+            <section class="result-box {% if prediction == 'Legitimate Website' %}theme-safe{% else %}theme-danger{% endif %} animate-slide-up">
+                <!-- Status Header -->
+                <div class="result-banner">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        {% if prediction == "Legitimate Website" %}
+                            <span class="status-text">SAFE TO VISIT</span>
+                        {% else %}
+                            <span class="status-text">SECURITY WARNING &bull; PHISHING DETECTED</span>
+                        {% endif %}
+                    </div>
+                    <div class="confidence-tag">
+                        <span>Confidence: <strong>{{ confidence }}%</strong></span>
+                    </div>
+                </div>
+
+                <div class="verdict-display">
+                    <h2 class="verdict-title">{{ prediction }}</h2>
+                    <p class="verdict-summary">
+                        Classification determined via trained logistic regression model and lexical heuristic evaluation.
+                    </p>
+                </div>
+
+                <!-- Probability Distribution Bar -->
+                <div class="metrics-panel">
+                    <div class="panel-header">
+                        <span>Classification Probabilities</span>
+                        <span class="model-badge"><i class="fa-solid fa-code-branch"></i> Logistic Regression</span>
+                    </div>
+                    <div class="prob-labels">
+                        <span class="legit-label"><i class="fa-solid fa-shield-check"></i> Legitimate: <strong>{{ p_legit }}%</strong></span>
+                        <span class="phish-label"><i class="fa-solid fa-bug"></i> Phishing: <strong>{{ p_phish }}%</strong></span>
+                    </div>
+                    <div class="prob-meter">
+                        <div class="meter-fill-legit" style="width: {{ p_legit }}%;"></div>
+                        <div class="meter-fill-phish" style="width: {{ p_phish }}%;"></div>
+                    </div>
+                </div>
+
+                <!-- Technical Inspection Breakdown -->
+                <div class="inspection-panel">
+                    <div class="panel-header">
+                        <span><i class="fa-solid fa-microchip"></i> Technical Feature Inspection</span>
+                        <button type="button" class="copy-url-btn" onclick="copyNormalizedUrl('{{ normalized_url }}')">
+                            <i class="fa-regular fa-copy"></i> Copy Parsed URL
+                        </button>
+                    </div>
+
+                    <div class="inspection-grid">
+                        <div class="grid-card full-width">
+                            <span class="grid-label">Parsed / Normalized URL</span>
+                            <span class="grid-value mono" id="normalizedUrlText">{{ normalized_url }}</span>
+                        </div>
+                        <div class="grid-card">
+                            <span class="grid-label">URL Character Length</span>
+                            <span class="grid-value">{{ features.length }} chars</span>
+                        </div>
+                        <div class="grid-card">
+                            <span class="grid-label">Structural Delimiters</span>
+                            <span class="grid-value">{{ features.dot_count }} dots &bull; {{ features.hyphen_count }} hyphens</span>
+                        </div>
+                        <div class="grid-card">
+                            <span class="grid-label">IP Address Used</span>
+                            <span class="grid-value {% if features.has_ip %}val-danger{% else %}val-safe{% endif %}">
+                                {% if features.has_ip %}
+                                    <i class="fa-solid fa-circle-xmark"></i> Yes (High Risk)
+                                {% else %}
+                                    <i class="fa-solid fa-circle-check"></i> No (Standard Domain)
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="grid-card">
+                            <span class="grid-label">Suspicious TLD Extension</span>
+                            <span class="grid-value {% if features.suspicious_tld %}val-danger{% else %}val-safe{% endif %}">
+                                {% if features.suspicious_tld %}
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Flagged Extension
+                                {% else %}
+                                    <i class="fa-solid fa-circle-check"></i> Clean
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        {% if features.is_institutional %}
+                        <div class="grid-card full-width institutional-highlight">
+                            <span class="grid-label">Institutional Accreditation</span>
+                            <span class="grid-value val-safe">
+                                <i class="fa-solid fa-building-columns"></i> Verified Government / Educational Domain (.gov / .nic / .edu / .ac)
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        {% if features.is_brand_spoofed %}
+                        <div class="grid-card full-width spoof-highlight">
+                            <span class="grid-label">Brand Spoofing Flag</span>
+                            <span class="grid-value val-danger">
+                                <i class="fa-solid fa-mask"></i> Impersonation detected for trademark '{{ features.spoofed_brand }}'
+                            </span>
+                        </div>
+                        {% endif %}
+
+                        <div class="grid-card full-width">
+                            <div class="risk-meter-row">
+                                <div>
+                                    <span class="grid-label">Heuristic Risk Score</span>
+                                    <span class="grid-value {% if features.heuristic_risk_score > 30 %}val-danger{% else %}val-safe{% endif %}">
+                                        {{ features.heuristic_risk_score }} / 100
+                                    </span>
+                                </div>
+                                <div class="risk-pill {% if features.heuristic_risk_score > 30 %}risk-pill-danger{% else %}risk-pill-safe{% endif %}">
+                                    {{ "Elevated Heuristic Risk" if features.heuristic_risk_score > 30 else "Low Heuristic Risk" }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- College Project Academic Footer -->
+            <footer class="card-footer">
+                <div class="footer-divider"></div>
+                <div class="footer-content">
+                    <p class="credits-text">
+                        <strong>Department of Computer Science & Engineering</strong> &bull; Summer Training Project
+                    </p>
+                    <p class="tech-text">
+                        <span>Framework: Flask</span> &bull; 
+                        <span>Model: Logistic Regression</span> &bull; 
+                        <span>Vectorizer: Character N-Grams (2–5)</span>
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script>
+function fillUrl(url) {
+    var input = document.getElementById('url');
+    input.value = url;
+    input.focus();
+}
+
+function clearInput() {
+    var input = document.getElementById('url');
+    input.value = '';
+    input.focus();
+}
+
+function copyNormalizedUrl(url) {
+    navigator.clipboard.writeText(url).then(function() {
+        var btn = document.querySelector('.copy-url-btn');
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        setTimeout(function() {
+            btn.innerHTML = originalText;
+        }, 1800);
+    });
+}
+</script>
+
+</body>
+</html>
