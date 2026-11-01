@@ -1,10 +1,14 @@
 # 🛡️ AI Phishing Website Detection System
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Render-46E3B7.svg?style=for-the-badge&logo=render&logoColor=white)](https://phishing-website-detection-bw3a.onrender.com/)
+
 [![Python](https://img.shields.io/badge/Python-3.10%20--%203.14-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.1-green.svg)](https://flask.palletsprojects.com/)
 [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.5%2B-orange.svg)](https://scikit-learn.org/)
 [![License](https://img.shields.io/badge/License-Academic-lightgrey.svg)]()
 [![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen.svg)]()
+
+> 🌐 **Live Web Application**: [https://phishing-website-detection-bw3a.onrender.com/](https://phishing-website-detection-bw3a.onrender.com/)
 
 An intelligent, real-time web application and machine learning system for classifying website URLs as **Legitimate** or **Phishing**. Powered by **Character N-Gram Vectorization** and **Logistic Regression**, enhanced with heuristic lexical analysis, brand spoofing detection, and URL normalization.
 
