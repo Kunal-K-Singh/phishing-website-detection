@@ -15,6 +15,7 @@ An intelligent, real-time web application and machine learning system for classi
 ---
 
 ## 📌 Table of Contents
+- [Live Deployment](#-live-deployment)
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Machine Learning Benchmark](#-machine-learning-benchmark)
@@ -22,9 +23,19 @@ An intelligent, real-time web application and machine learning system for classi
 - [Project Directory Structure](#-project-directory-structure)
 - [Installation & Setup](#-installation--setup)
 - [Running the Application](#-running-the-application)
+- [Production Deployment](#-production-deployment)
 - [API Usage](#-api-usage)
 - [Running Automated Tests](#-running-automated-tests)
 - [Academic Credits](#-academic-credits)
+
+---
+
+## 🌐 Live Deployment
+
+The application is deployed and live on **Render**:
+- **Live URL**: [https://phishing-website-detection-bw3a.onrender.com/](https://phishing-website-detection-bw3a.onrender.com/)
+- **API Status**: Active (`POST /api/predict`)
+- **Runtime**: Python 3.10+ / Gunicorn WSGI
 
 ---
 
@@ -121,7 +132,9 @@ Phishing-Website-Detection/
 │   ├── __init__.py              # Test package marker
 │   └── test_prediction.py       # Automated test suite (pytest)
 ├── .gitignore                   # Ignored files (caches, envs, IDEs)
+├── Dockerfile                   # Production container build definition
 ├── requirements.txt             # Python dependency requirements
+├── wsgi.py                      # Production WSGI entry point (Gunicorn)
 └── README.md                    # Project documentation
 ```
 
@@ -168,6 +181,24 @@ http://127.0.0.1:5000/
 
 ---
 
+## ☁️ Production Deployment
+
+The project is pre-configured for production environments using **Gunicorn** or **Docker**:
+
+### Option A: Gunicorn WSGI (Render Production Setup)
+```bash
+gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+```
+
+### Option B: Docker Container
+Build and run the self-contained production image:
+```bash
+docker build -t phishing-detection .
+docker run -p 5000:5000 phishing-detection
+```
+
+---
+
 ## 🔌 API Usage
 
 You can query the system programmatically via HTTP POST:
@@ -176,7 +207,15 @@ You can query the system programmatically via HTTP POST:
 
 **Request:**
 ```bash
-curl -X POST http://127.0.0.1:5000/api/predict      -H "Content-Type: application/json"      -d "{"url": "https://www.google.com"}"
+# Live Deployment:
+curl -X POST https://phishing-website-detection-bw3a.onrender.com/api/predict \
+     -H "Content-Type: application/json" \
+     -d '{"url": "https://www.google.com"}'
+
+# Or Local Development:
+curl -X POST http://127.0.0.1:5000/api/predict \
+     -H "Content-Type: application/json" \
+     -d '{"url": "https://www.google.com"}'
 ```
 
 **Response:**
